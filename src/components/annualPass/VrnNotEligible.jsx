@@ -17,7 +17,7 @@ const VrnNotEligible = ({ handleNextStep }) => {
     </span>
   {/* Warning Icon */}
 
-    <img src="/assets/warning.svg" alt="warning" className="w-[2.8rem] h-[2.8rem]" />
+    <img src="/annualpass/assets/warning.svg" alt="warning" className="w-[2.8rem] h-[2.8rem]" />
 
     <h3 className="text-[1.7rem] font-[590] text-black ml-2">
       Your Vehicle is Ineligible

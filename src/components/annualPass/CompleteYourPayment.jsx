@@ -1,24 +1,28 @@
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { FaArrowLeft } from "react-icons/fa";
+
 import AnnualPass from "../../components/annualPass/AnnualPass.jsx";
 import encryptPayload from "../../utils/encryptPayload.js";
 import decryptPayload from "../../utils/decryptPayload.js";
-import { useEffect, useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
 import useDataStore from "../../data/useDataStore.js";
 
 const CompleteYourPayment = ({ handleBack, handleNextStep }) => {
-  const { numberPlate, isLoggedIn } = useDataStore();
+  const {
+    numberPlate,
+    isLoggedIn,
+    eligibility,
+    userId,
+    setPaymentStatus,
+  } = useDataStore();
+
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
-  const [orderData, setOrderData] = useState(null);
-  const [orderId, setOrderId] = useState(null);
-  const [currency, setCurrency] = useState("INR");
-  const [keyId, setKeyId] = useState("");
-  const [amount, setAmount] = useState("");
+  const [currency] = useState("INR");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Load Razorpay script
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
@@ -34,97 +38,81 @@ const CompleteYourPayment = ({ handleBack, handleNextStep }) => {
   const createOrder = async () => {
     try {
       setIsLoading(true);
+      setError(null);
+
       const payload = {
-        vehicle_regno: "kl01A234",
+        vehicle_regno: numberPlate,
+        eligibility_id: eligibility,
+        user_id: userId,
         call_from: "web",
-        eligibility_id: 9,
-        user_id: 2,
       };
 
-      const encryptedString = await encryptPayload(payload);
-      console.log("Encrypted String:", encryptedString);
-      const requestBody = { data: encryptedString };
+      const encryptedString = encryptPayload(payload);
 
-      const response = await fetch(
-        "/nhai/api/annual-pass/razorpay/v3.0/create-order",
+      const response = await axios.post(
+        "/api/annual-pass/razorpay/v3.0/create-order",
+        { data: encryptedString },
         {
-          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody),
+          timeout: 10000,
         }
       );
 
-      if (!response.ok) throw new Error("Failed to create order");
+      const { payload: encryptedPayload } = response.data;
 
-      const data = await response.json();
-      console.log("Order API response:", data);
-      const decryptedData = await decryptPayload(data.payload);
-      console.log(
-        "Decrypted Data:",
-        decryptedData.key,
-        decryptedData.amount,
-        decryptedData.order_id,
-        decryptedData.currency
-      );
-
-      if (
-        !decryptedData.key ||
-        !decryptedData.amount ||
-        !decryptedData.order_id
-      ) {
-        throw new Error("Invalid payment data received");
+      if (!encryptedPayload) {
+        throw new Error("Missing encrypted payload in response");
       }
 
-      setKeyId(decryptedData.key);
-      setAmount(decryptedData.amount);
-      setOrderId(decryptedData.order_id);
-      setOrderData(decryptedData);
-    } catch (error) {
-      console.error("Payment error:", error);
-      setError(error.message);
+      const decrypted = decryptPayload(encryptedPayload);
+
+      // ✅ Log decrypted response
+      if (import.meta.env.MODE === "development") {
+        console.log("🔓 Decrypted Razorpay order response:", decrypted);
+      }
+
+      if (
+        !decrypted?.key ||
+        !decrypted?.amount ||
+        !decrypted?.order_id ||
+        !decrypted?.currency
+      ) {
+        throw new Error("Invalid response from server");
+      }
+
+      return decrypted;
+    } catch (err) {
+      const message =
+        err?.response?.data?.error || err?.message || "Unexpected error occurred";
+      setError(message);
+      setPaymentStatus({ success: false, error: message });
+      handleNextStep("failed");
+      return null;
     } finally {
       setIsLoading(false);
     }
   };
-  console.log(
-    "Order ID:",
-    orderId,
-    "Key ID:",
-    keyId,
-    "Amount:",
-    amount,
-    "Currency:",
-    currency
-  );
+
   const handleProceed = async () => {
-    // if (!orderId) {
-    await createOrder();
-    // }
-    openRazorpay();
+    const orderData = await createOrder();
+    if (orderData) openRazorpay(orderData);
   };
 
-  const openRazorpay = () => {
-    if (!isScriptLoaded) {
-      alert("Payment processor not ready yet");
-      return;
-    }
-
-    if (!orderId) {
-      alert("Payment details not loaded");
-      return;
-    }
+  const openRazorpay = (paymentData) => {
+    if (!isScriptLoaded) return alert("Payment processor not loaded");
+    if (!paymentData?.order_id) return alert("Missing payment info");
 
     const options = {
-      key: keyId,
-      amount: amount,
-      currency: currency,
+      key: paymentData.key,
+      amount: paymentData.amount,
+      currency: paymentData.currency || currency,
       name: "NHAI",
       description: "Annual Pass Payment",
       image: "https://example.com/your_logo",
-      order_id: orderId,
+      order_id: paymentData.order_id,
       handler: function (response) {
-        console.log("Payment success:", response);
-        handleNextStep(8); // Proceed after successful payment
+        setPaymentStatus({ success: true, response });
+        handleNextStep("success");
       },
       prefill: {
         name: "Customer Name",
@@ -139,17 +127,19 @@ const CompleteYourPayment = ({ handleBack, handleNextStep }) => {
       },
     };
 
-    const rzp1 = new window.Razorpay(options);
-    //   rzp1.on('payment.failed', function (response) {
-    //   console.log('Payment failed:', response.error);
-    //   handleNextStep(10); // Payment failed ➜ next step 10
-    // });
-    rzp1.open();
+    const rzp = new window.Razorpay(options);
+
+    rzp.on("payment.failed", function (err) {
+      setPaymentStatus({ success: false, error: err.error });
+      handleNextStep("failed");
+    });
+
+    rzp.open();
   };
 
   return (
     <div className="flex flex-col w-[55%] font-inter justify-around items-center p-6 pt-3 h-full space-y-6">
-      {/* Header with back arrow and title */}
+      {/* Header */}
       <div className="flex items-start gap-4 my-2 w-full">
         <span
           className="text-[#0000004D] text-[1.5rem] font-medium cursor-pointer hover:text-gray-600"
@@ -168,7 +158,7 @@ const CompleteYourPayment = ({ handleBack, handleNextStep }) => {
         </div>
       </div>
 
-      {/* FASTag / Annual Pass Card */}
+      {/* Annual Pass Card */}
       <div className="flex w-[86%] mb-3">
         <AnnualPass
           numberPlate={numberPlate}
@@ -185,8 +175,8 @@ const CompleteYourPayment = ({ handleBack, handleNextStep }) => {
         />
       </div>
 
-      {/* Note Section */}
-      <div className="w-[26.5rem] bg-white border border-[#00000026] rounded-[0.6rem] p-3 leading-relaxed font-inter text-[0.7rem] ">
+      {/* Note */}
+      <div className="w-[26.5rem] bg-white border border-[#00000026] rounded-[0.6rem] p-3 leading-relaxed font-inter text-[0.7rem]">
         <p className="text-[#4F4F4F]">
           <span className="font-semibold">Note:</span> This is only pre-booking
           of the pass. Your pass will activate automatically on{" "}
@@ -201,7 +191,7 @@ const CompleteYourPayment = ({ handleBack, handleNextStep }) => {
         </p>
       </div>
 
-      {/* Payment Section */}
+      {/* Fee */}
       <div className="w-[88%] border-t border-[#D9D9D9] pt-4 flex justify-between items-center text-[1rem]">
         <span>Total Payable Fee</span>
         <span className="font-bold font-inter text-black">₹ 3,000</span>

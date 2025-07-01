@@ -18,7 +18,9 @@ const useDataStore = create((set) => ({
   passUserId: "",
   verifiedNumbers: [],
   ownerName: "",
+  showCongratulations: false,
 
+  setShowCongratulations: (flag) => set({ showCongratulations: flag }),
   setNumberPlate: (plate) => set({ numberPlate: plate }),
   setEligibility: (isEligible) => set({ eligibility: isEligible }),
   setEligibilityId: (id) => set({ eligibilityId: id }),

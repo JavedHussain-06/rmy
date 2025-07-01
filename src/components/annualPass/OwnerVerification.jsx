@@ -112,7 +112,7 @@ const OwnerVerification = ({ handleNextStep, handleBack }) => {
       {/* Image */}
       <div className="flex items-center w-full flex-col mb-8">
         <img
-          src="/assets/phoneOTP.svg"
+          src="/annualpass/assets/phoneOTP.svg"
           alt="phone"
           className="w-[6.88rem] h-[6.6rem] m-auto"
         />

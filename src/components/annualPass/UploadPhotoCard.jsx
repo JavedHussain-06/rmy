@@ -80,7 +80,7 @@ const UploadPhotoCard = forwardRef(({ onFileSelect, error }, ref) => {
         ) : (
           <div className="flex items-center gap-2 text-[#0153AB]">
             <img
-              src="/assets/frame.svg"
+              src="/annualpass/assets/frame.svg"
               alt="upload"
               className="w-4 h-4"
             />

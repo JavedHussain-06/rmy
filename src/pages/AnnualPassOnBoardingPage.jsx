@@ -9,19 +9,28 @@ import UploadPhotoStageContainer from "../components/annualPass/UploadPhotoStage
 import OwnerVerification from "../components/annualPass/OwnerVerification";
 import OtpVerification from "../components/annualPass/OtpVerification";
 import YourVehicleIsEligible from "../components/annualPass/YourVehicleIsEligible";
-import PaymentOption from "../components/annualPass/PaymentOption";
 import PaymentSuccessful from "../components/annualPass/PaymentSuccessful";
 import PaymentFailed from "../components/annualPass/PaymentFailed";
 import CompleteYourPayment from "../components/annualPass/CompleteYourPayment";
+import CongratulationsPage from "./CongratulationsPage"; // ✅ Make sure path is correct
 
 const AnnualPassOnBoardingPage = () => {
-  const { currentStage, setCurrentStage, eligibility, setPaymentStatus } =
-    useDataStore();
+  const {
+    currentStage,
+    setCurrentStage,
+    eligibility,
+    showCongratulations,
+  } = useDataStore();
+
+  // ✅ Render only Congratulations if flag is true
+  if (showCongratulations) {
+    return <CongratulationsPage />;
+  }
 
   const renderStageComponent = () => {
     switch (currentStage) {
       case 0:
-        return <VrnEligibilityContainer  handleBack={() => setCurrentStage(1)} />;
+        return <VrnEligibilityContainer handleBack={() => setCurrentStage(1)} />;
 
       case 1:
         return <GetReadyToStart onContinue={() => setCurrentStage(0)} />;
@@ -57,30 +66,20 @@ const AnnualPassOnBoardingPage = () => {
         );
 
       case 7:
-        return <CompleteYourPayment 
-        handleNextStep={() => setCurrentStage(8)}
-            handleBack={() => setCurrentStage(5)}
-        />;
-
-      case 8:
         return (
-          <PaymentOption
-            handleBack={() => setCurrentStage(7)}
-            handleNext={(paymentMethod) => {
-              if (paymentMethod === "cards") {
-                setCurrentStage(10); // PaymentFailed
-              } else {
-                setCurrentStage(9); // PaymentSuccessful
-              }
-            }}
+          <CompleteYourPayment
+            handleBack={() => setCurrentStage(5)}
+            handleNextStep={(status) =>
+              setCurrentStage(status === "success" ? 9 : 10)
+            }
           />
         );
 
       case 9:
-        return <PaymentSuccessful handleBack={() => setCurrentStage(8)} />;
+        return <PaymentSuccessful />;
 
       case 10:
-        return <PaymentFailed handleBack={() => setCurrentStage(8)} />;
+        return <PaymentFailed handleBack={() => setCurrentStage(7)} />;
 
       default:
         return (

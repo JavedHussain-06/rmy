@@ -5,7 +5,7 @@ import AnnualPassPage from "./pages/AnnualPassPage";
 import LoginPage from "./pages/LoginPage";
 import DashBoardPage from "./pages/DashBoardPage";
 import Footer from "./components/Footer";
-import CongratulationsPage from "./pages/CongratulationsPage";
+import PaymentSuccessful from "../src/components/annualPass/PaymentSuccessful";
 
 
 const App = () => {
@@ -16,7 +16,7 @@ const App = () => {
         <Route path="/" element={<AnnualPassPage />} />
         <Route path="/annual-pass/onboarding" element={<AnnualPassOnBoardingPage />} />
         <Route path="/annual-pass/dashboard" element={<DashBoardPage/>} />
-        <Route path="/congratulations" element={<CongratulationsPage/>} />
+        <Route path="/payment" element={<PaymentSuccessful/>} />
       </Routes>
       {/* <Footer /> */}
     </>

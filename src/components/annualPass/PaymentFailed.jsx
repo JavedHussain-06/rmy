@@ -13,7 +13,7 @@ const PaymentFailed = ({ handleBack }) => {
 
         <div className="flex flex-col items-start gap-2 ml-8">
           <img
-            src="/assets/paymentFailed.svg"
+            src="/annualpass/assets/paymentFailed.svg"
             alt="Payment Failed"
             className="w-16 h-16"
           />

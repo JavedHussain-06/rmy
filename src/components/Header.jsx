@@ -18,7 +18,7 @@ const Header = () => {
       items-center h-20">
         {/* Logo */}
         <NavLink to="/" className="text-2xl font-bold text-blue-600 flex ">
-        <img className="h-[50px] w-[50px] object-contain rounded-full mr-3" src="/assets/rmy.png" alt="logo" />
+        <img className="h-[50px] w-[50px] object-contain rounded-full mr-3" src="/annualpass/assets/rmy.png" alt="logo" />
           <span className="mt-2">RajmargYatra</span>
         </NavLink>
 

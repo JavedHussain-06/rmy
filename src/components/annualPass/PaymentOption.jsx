@@ -10,7 +10,7 @@ const PaymentOption = ({ handleBack, handleNext }) => {
       value: "googlepay",
       icon: (
         <img
-          src="/assets/googlepayLogo.svg"
+          src="/annualpass/assets/googlepayLogo.svg"
           alt="Google Pay"
           className="w-6 h-6"
         />
@@ -21,7 +21,7 @@ const PaymentOption = ({ handleBack, handleNext }) => {
       value: "paytm",
       icon: (
         <img
-          src="/assets/paytmLogo.svg"
+          src="/annualpass/assets/paytmLogo.svg"
           alt="Paytm"
           className="w-6 h-6"
         />
@@ -32,7 +32,7 @@ const PaymentOption = ({ handleBack, handleNext }) => {
       value: "upi",
       icon: (
         <img
-          src="/assets/upiLogo.png"
+          src="/annualpass/assets/upiLogo.png"
           alt="UPI"
           className="w-6 h-6"
         />

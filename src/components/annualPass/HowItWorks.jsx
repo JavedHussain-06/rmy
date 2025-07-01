@@ -19,7 +19,7 @@ const HowItWorks = () => {
     <div className="flex flex-col items-center text-center lg:flex-row lg:items-center justify-between w-full lg:w-[30%] gap-[1rem]">
       <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
         <img src="/
-        /assets/car.svg" alt="car" className="w-[3rem] h-[3rem] mb-[1rem]" />
+        /annualpass/assets/car.svg" alt="car" className="w-[3rem] h-[3rem] mb-[1rem]" />
         <h4 className="text-darkBlue text-[1.6rem] font-bold font-inter tracking-[0.007rem]">
           Check Eligibility
         </h4>
@@ -34,7 +34,7 @@ const HowItWorks = () => {
     {/* Step 2 */}
     <div className="flex flex-col items-center text-center lg:flex-row lg:items-center justify-between w-full lg:w-[32%] gap-[1rem]">
       <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-        <img src="/assets/rupee.svg" alt="rupee" className="w-[3rem] h-[3rem]" />
+        <img src="/annualpass/assets/rupee.svg" alt="rupee" className="w-[3rem] h-[3rem]" />
         <h4 className="text-darkBlue text-[1.6rem] font-bold font-inter mt-[0.5rem] tracking-[0.007rem]">
           Complete Payment
         </h4>
@@ -48,7 +48,7 @@ const HowItWorks = () => {
 
     {/* Step 3 */}
     <div className="flex flex-col items-center text-center lg:items-start lg:text-left w-full lg:w-[25%]">
-      <img src="/assets/toll.svg" alt="toll" className="w-[3rem] h-[3rem]" />
+      <img src="/annualpass/assets/toll.svg" alt="toll" className="w-[3rem] h-[3rem]" />
       <h4 className="text-darkBlue text-[1.6rem] font-bold font-inter mt-[0.7rem] tracking-[0.007rem]">
         Enjoy Free Trips
       </h4>

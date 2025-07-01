@@ -28,7 +28,7 @@ const CongratulationsPage = ({ handleGoToDashboard }) => {
     <div className="w-full h-[82vh] flex items-center justify-center bg-[#F9FAFB] relative font-inter overflow-hidden">
       <div
         ref={cardRef}
-        className="bg-white rounded-2xl shadow-xl w-[90%] h-[35rem] lg:w-[70%] px-8 py-10 relative z-10 overflow-hidden flex flex-col items-center justify-center"
+        className="bg-white rounded-2xl shadow-xl w-[90%] h-[35rem] lg:w-[80%] px-8 py-10 relative z-10 overflow-hidden flex flex-col items-center justify-center"
       >
         <div>
           {/* 🎉 Confetti inside card only */}

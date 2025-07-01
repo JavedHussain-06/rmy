@@ -94,7 +94,7 @@ const LoginPage = ({ onClose }) => {
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-4">
               <img
-                src="/assets/nhai-logo.png"
+                src="/annualpass/assets/nhai-logo.png"
                 alt="nhai logo"
                 className="w-[2.6rem] h-[2.6rem] mr-6"
               />
