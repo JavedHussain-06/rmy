@@ -8,7 +8,7 @@ const AnnualPassProgressFlow = ({ currentStage }) => {
   return (
     <div
       className="w-[50%] relative bg-cover bg-no-repeat object-center"
-      style={{ backgroundImage: "url('/annualpass/assets/roadImg.png')" }}
+      style={{ backgroundImage: "url('/assets/roadImg.png')" }}
     >
       
     </div>

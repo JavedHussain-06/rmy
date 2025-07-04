@@ -18,9 +18,13 @@ const useDataStore = create((set) => ({
   passUserId: "",
   verifiedNumbers: [],
   ownerName: "",
-  showCongratulations: false,
+  vrnSubmissionAttempt: false,
+  vrnEditedAfterSubmit: false,
 
-  setShowCongratulations: (flag) => set({ showCongratulations: flag }),
+  //setters
+  setVrnEditedAfterSubmit: (value) => set({ vrnEditedAfterSubmit: value }),
+  setVrnSubmissionAttempt: (value) => set({ vrnSubmissionAttempt: value }),
+  setIsVrnValid: (status) => set({ isVrnValid: status }),
   setNumberPlate: (plate) => set({ numberPlate: plate }),
   setEligibility: (isEligible) => set({ eligibility: isEligible }),
   setEligibilityId: (id) => set({ eligibilityId: id }),

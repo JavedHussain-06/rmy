@@ -37,7 +37,7 @@ const UploadVehiclePhoto = () => {
     formData.append("user_id", userId);
 
     try {
-      const res = await axios.post("/api/annualpass/upload-image", formData, {
+      const res = await axios.post("/nhai/api/annualpass/upload-image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -129,8 +129,8 @@ const UploadVehiclePhoto = () => {
       {/* Image Examples */}
       <div className="flex justify-center gap-6 w-full mb-2">
         {[
-          ["/annualpass/assets/check_circle_without_bg.svg", "Correct"],
-          ["/annualpass/assets/cancel.svg", "Wrong"],
+          ["/assets/check_circle_without_bg.svg", "Correct"],
+          ["/assets/cancel.svg", "Wrong"],
         ].map(([icon, label], i) => (
           <div key={i} className="flex flex-col items-center gap-1">
             <img src={icon} alt={label} className="w-5 h-5" />
@@ -147,7 +147,7 @@ const UploadVehiclePhoto = () => {
           "Avoid glare or reflections",
         ].map((text, i) => (
           <div key={i} className="flex items-center gap-2">
-            <img src="/annualpass/assets/check_circle.svg" alt="Check" className="w-4 h-4" />
+            <img src="/assets/check_circle.svg" alt="Check" className="w-4 h-4" />
             <span className="text-[0.9rem] text-[#1B1B1D]">{text}</span>
           </div>
         ))}

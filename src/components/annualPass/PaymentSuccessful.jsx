@@ -14,7 +14,7 @@ const PaymentSuccessful = () => {
       <div className="relative w-full max-w-md flex justify-center mb-3">
         <div className="flex flex-col items-start gap-2 mr-24">
           <img
-            src="/annualpass/assets/paymentSuccessful.svg"
+            src="/assets/paymentSuccessful.svg"
             alt="Payment successful"
             className="w-16 h-16"
           />

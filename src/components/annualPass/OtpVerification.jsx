@@ -42,7 +42,7 @@ const OtpVerification = ({ handleNextStep, handleBack }) => {
       });
 
       const res = await axios.post(
-        "/api/annualpass/v3.0/verify-annual-pass-otp",
+        "/nhai/api/annualpass/v3.0/verify-annual-pass-otp",
         { data: encryptedData },
         {
           headers: { "Content-Type": "application/json" },
@@ -103,7 +103,7 @@ const OtpVerification = ({ handleNextStep, handleBack }) => {
 
         <div className="flex items-center flex-col my-4">
           <img
-            src="/annualpass/assets/phoneOTP.svg"
+            src="/assets/phoneOTP.svg"
             alt="phone"
             className="w-[6.88rem] h-[6.6rem]"
           />

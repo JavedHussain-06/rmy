@@ -1,5 +1,4 @@
 import { motion } from "motion/react";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 
@@ -7,6 +6,11 @@ import AnnualPass from "../../components/annualPass/AnnualPass.jsx";
 import encryptPayload from "../../utils/encryptPayload.js";
 import decryptPayload from "../../utils/decryptPayload.js";
 import useDataStore from "../../data/useDataStore.js";
+
+const isDev = import.meta.env.DEV;
+const baseUrl = isDev
+  ? "/api"
+  : "https://117.221.20.185/nhai/api";
 
 const CompleteYourPayment = ({ handleBack, handleNextStep }) => {
   const {
@@ -49,25 +53,26 @@ const CompleteYourPayment = ({ handleBack, handleNextStep }) => {
 
       const encryptedString = encryptPayload(payload);
 
-      const response = await axios.post(
-        "/api/annual-pass/razorpay/v3.0/create-order",
-        { data: encryptedString },
+      const res = await fetch(
+        `${baseUrl}/annual-pass/razorpay/v3.0/create-order`,
         {
-          headers: { "Content-Type": "application/json" },
-          timeout: 10000,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ data: encryptedString }),
         }
       );
 
-      const { payload: encryptedPayload } = response.data;
+      const data = await res.json();
 
-      if (!encryptedPayload) {
+      if (!data?.payload) {
         throw new Error("Missing encrypted payload in response");
       }
 
-      const decrypted = decryptPayload(encryptedPayload);
+      const decrypted = decryptPayload(data.payload);
 
-      // ✅ Log decrypted response
-      if (import.meta.env.MODE === "development") {
+      if (isDev) {
         console.log("🔓 Decrypted Razorpay order response:", decrypted);
       }
 
@@ -82,8 +87,7 @@ const CompleteYourPayment = ({ handleBack, handleNextStep }) => {
 
       return decrypted;
     } catch (err) {
-      const message =
-        err?.response?.data?.error || err?.message || "Unexpected error occurred";
+      const message = err.message || "Unexpected error occurred";
       setError(message);
       setPaymentStatus({ success: false, error: message });
       handleNextStep("failed");

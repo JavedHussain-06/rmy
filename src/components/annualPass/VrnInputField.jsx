@@ -3,69 +3,94 @@ import { motion } from "motion/react";
 import useDataStore from "../../data/useDataStore";
 
 const VrnInputField = () => {
-  const { numberPlate, setNumberPlate, placeHolder } = useDataStore();
-  const [isValid, setsValid] = useState(false);
+  const {
+    numberPlate,
+    setNumberPlate,
+    placeHolder,
+    vrnSubmissionAttempt,
+    vrnEditedAfterSubmit,
+    setVrnEditedAfterSubmit,
+  } = useDataStore();
 
-  const isNumberPlateValid = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+  const isValid10Digit = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+  const isValid9Digit = /^[A-Z]{2}[0-9]{2}[A-Z]{1}[0-9]{4}$/;
 
-  const isPartiallyValid = (input) => {
-    const value = input.toUpperCase();
-    if (value.length > 10) return false;
+  const shouldAllowInput = (value) => {
+    const upper = value.toUpperCase();
+    const length = upper.length;
 
-    const isNumberPlateFormatted = [
-      /^[A-Z]{0,2}$/,
-      /^[A-Z]{2}[0-9]{0,2}$/,
-      /^[A-Z]{2}[0-9]{2}[A-Z]{0,2}$/,
-      /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{0,4}$/,
-    ];
+    if (!/^[A-Z0-9]*$/.test(upper)) return false;
 
-    return isNumberPlateFormatted.some((regex) => regex.test(value));
+    if (length <= 2) return /^[A-Z]{0,2}$/.test(upper);
+    if (length <= 4) return /^[A-Z]{2}[0-9]{0,2}$/.test(upper);
+    if (length === 5) return /^[A-Z]{2}[0-9]{2}[A-Z]$/.test(upper);
+    if (length === 6) {
+      return (
+        /^[A-Z]{2}[0-9]{2}[A-Z]{2}$/.test(upper) ||
+        /^[A-Z]{2}[0-9]{2}[A-Z]{1}[0-9]{1}$/.test(upper)
+      );
+    }
+
+    const first6 = upper.slice(0, 6);
+    const rest = upper.slice(6);
+
+    if (/^[A-Z]{2}[0-9]{2}[A-Z]{2}$/.test(first6)) {
+      return /^[0-9]{0,4}$/.test(rest) && length <= 10;
+    }
+
+    if (/^[A-Z]{2}[0-9]{2}[A-Z]{1}[0-9]{1}$/.test(first6)) {
+      return /^[0-9]{0,3}$/.test(rest) && length <= 9;
+    }
+
+    return false;
   };
 
   const handleChange = (e) => {
-    const value = e.target.value.toUpperCase();
-    setNumberPlate(value);
+    const raw = e.target.value.toUpperCase();
 
-    const isFullValid = isNumberPlateValid.test(value);
-    const isPartialValidFlag = isPartiallyValid(value);
+    if (!shouldAllowInput(raw)) return;
 
-    const inputIsInvalid =
-      !isPartialValidFlag || (value.length === 10 && !isFullValid);
-
-    setsValid(inputIsInvalid);
+    setNumberPlate(raw);
+    setVrnEditedAfterSubmit(true); // ✅ Reset error if user edits
   };
+
+  const isInvalidPattern =
+    vrnSubmissionAttempt &&
+    !vrnEditedAfterSubmit &&
+    numberPlate.trim().length > 0 &&
+    !isValid9Digit.test(numberPlate) &&
+    !isValid10Digit.test(numberPlate);
 
   return (
     <div className="w-full max-w-[100%]">
       <motion.div
         className={`border-2 rounded-[0.5rem] transition-all duration-200 overflow-hidden flex w-full max-w-[100%] ${
-          isValid ? "border-red-500" : "border-darkBlue"
+          isInvalidPattern ? "border-red-500" : "border-darkBlue"
         }`}
         initial={{ scale: 1, rotate: 0 }}
         animate={
-          isValid
+          isInvalidPattern
             ? {
                 x: [0, -36, 36, -44, 44, -42, 42, 0],
-                transition: {
-                  duration: 0.6,
-                  ease: "easeInOut",
-                  repeat: 0,
-                },
+                transition: { duration: 0.6, ease: "easeInOut", repeat: 0 },
               }
             : { x: 0 }
         }
       >
+        {/* IND Box */}
         <div
           className={`flex flex-col items-center justify-center w-[18%] ${
-            isValid ? "border-r-2 border-red-500" : "border-r-2 border-darkBlue"
+            isInvalidPattern
+              ? "border-r-2 border-red-500"
+              : "border-r-2 border-darkBlue"
           }`}
         >
           <div className="mb-1">
             <img
               src={
-                isValid
-                  ? "/annualpass/assets/redVrnPlate.svg"
-                  : "/annualpass/assets/blueVrnPlate.svg"
+                isInvalidPattern
+                  ? "/assets/redVrnPlate.svg"
+                  : "/assets/blueVrnPlate.svg"
               }
               alt="IND"
               className="w-[1.22rem] h-[1.08rem]"
@@ -73,14 +98,13 @@ const VrnInputField = () => {
           </div>
           <span
             className={`font-Barlow font-semibold text-[0.64rem] ${
-              isValid ? "text-red-500" : "text-darkBlue"
+              isInvalidPattern ? "text-red-500" : "text-darkBlue"
             }`}
           >
             IND
           </span>
         </div>
 
-        {/* Input Field */}
         <div className="flex-1">
           <input
             type="text"
@@ -93,10 +117,9 @@ const VrnInputField = () => {
         </div>
       </motion.div>
 
-      {/* Invalid Message */}
-      {isValid && (
+      {isInvalidPattern && (
         <p className="text-red-500 text-sm mt-2 font-medium">
-          Invalid VRN. Please enter a valid VRN.
+          Invalid VRN. Please follow correct format.
         </p>
       )}
     </div>

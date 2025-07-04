@@ -43,7 +43,7 @@ const OwnerVerification = ({ handleNextStep, handleBack }) => {
       });
 
       const response = await axios.post(
-        "/api/annualpass/v3.0/generate-annual-pass-otp",
+        "/nhai/api/annualpass/v3.0/generate-annual-pass-otp",
         { data: encryptedData },
         {
           headers: {
@@ -112,7 +112,7 @@ const OwnerVerification = ({ handleNextStep, handleBack }) => {
       {/* Image */}
       <div className="flex items-center w-full flex-col mb-8">
         <img
-          src="/annualpass/assets/phoneOTP.svg"
+          src="/assets/phoneOTP.svg"
           alt="phone"
           className="w-[6.88rem] h-[6.6rem] m-auto"
         />

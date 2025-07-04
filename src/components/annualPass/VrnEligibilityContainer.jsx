@@ -9,19 +9,35 @@ import decryptPayload from "../../utils/decryptPayload";
 import encryptPayload from "../../utils/encryptPayload";
 
 const VrnEligibilityContainer = ({ handleBack }) => {
-  const {
-    numberPlate,
-    userId,
-    setEligibilityData,
-    setEligibilityId,
-    setTags,
-    setEligibilityErrorMessage,
-    setCurrentStage,
-  } = useDataStore();
-
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
+    const {
+      numberPlate,
+      userId,
+      setEligibilityData,
+      setEligibilityId,
+      setTags,
+      setEligibilityErrorMessage,
+      setCurrentStage,
+      setVrnSubmissionAttempt,
+      setVrnEditedAfterSubmit,
+    } = useDataStore.getState();
+
+    const isValid10Digit = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+    const isValid9Digit = /^[A-Z]{2}[0-9]{2}[A-Z]{1}[0-9]{4}$/;
+
+    setVrnEditedAfterSubmit(false);
+    setVrnSubmissionAttempt(true);
+
+    const isValidFormat =
+      isValid10Digit.test(numberPlate) || isValid9Digit.test(numberPlate);
+
+    if (!isValidFormat) {
+      setEligibilityErrorMessage("Invalid VRN format. Please check and try again.");
+      return;
+    }
+
     const payload = {
       vehicleRegNo: numberPlate,
       userId: userId,
@@ -33,32 +49,24 @@ const VrnEligibilityContainer = ({ handleBack }) => {
       const encryptedPayload = encryptPayload(payload);
 
       const response = await axios.post(
-        "/api/annualpass/netc/v3.0/initiate-annual-pass",
+        "/nhai/api/annualpass/netc/v3.0/initiate-annual-pass",
         { data: encryptedPayload },
         {
           headers: {
             "Content-Type": "application/json",
           },
+          validateStatus: () => true,
         }
       );
 
-      const encryptedResponse = response.data;
-
-      if (!encryptedResponse) {
-        throw new Error("Server did not return an encrypted payload.");
-      }
+      const encryptedResponse = response?.data;
+      if (!encryptedResponse) throw new Error("No payload returned from server");
 
       const decryptedResponse = decryptPayload(encryptedResponse);
-
-      const resultCode =
-        decryptedResponse.resultCode || decryptedResponse.status || 200;
+      const resultCode = decryptedResponse.resultCode || decryptedResponse.status || response.status;
       const data = decryptedResponse.data || decryptedResponse.payload || {};
 
-      if (
-        resultCode === 200 &&
-        data.eligibilityId &&
-        Array.isArray(data.tags)
-      ) {
+      if (resultCode === 200 && data.eligibilityId && Array.isArray(data.tags)) {
         setEligibilityId(data.eligibilityId);
         setTags(data.tags);
         setEligibilityData({
@@ -72,15 +80,27 @@ const VrnEligibilityContainer = ({ handleBack }) => {
         const errorMessage =
           decryptedResponse?.errorMsg ||
           decryptedResponse?.message ||
-          "Eligibility check failed.";
+          "Eligibility check failed. Please try again.";
         setEligibilityErrorMessage(errorMessage);
         setCurrentStage(2);
       }
-    } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message ||
-        "Something went wrong. Please try again later.";
-      setEligibilityErrorMessage(errorMessage);
+    } catch (err) {
+      const encryptedError = err?.response?.data;
+      let fallbackError = "Something went wrong. Please try again later.";
+
+      if (encryptedError?.payload) {
+        try {
+          const decryptedError = decryptPayload(encryptedError);
+          fallbackError =
+            decryptedError?.errorMsg ||
+            decryptedError?.message ||
+            fallbackError;
+        } catch (_) {
+          // Ignore decryption failure
+        }
+      }
+
+      setEligibilityErrorMessage(fallbackError);
       setCurrentStage(2);
     } finally {
       setLoading(false);
@@ -89,7 +109,7 @@ const VrnEligibilityContainer = ({ handleBack }) => {
 
   return (
     <div className="flex flex-col items-center justify-around gap-4 p-8 w-[50%] relative">
-      {/* Header and VRN Input */}
+      {/* Header */}
       <div className="flex items-center gap-2 justify-start mb-6 font-inter absolute top-10 left-8">
         <span
           className="text-[#0000004D] text-[1.2rem] font-[500] tracking-[0.048rem] hover:text-gray-500 cursor-pointer"
@@ -102,6 +122,7 @@ const VrnEligibilityContainer = ({ handleBack }) => {
         </h3>
       </div>
 
+      {/* Description */}
       <div className="w-[80%] mt-16 flex flex-col items-start justify-between h-[25%]">
         <p className="text-[1rem] font-inter mb-8">
           Vehicle must be <span className="font-black">CAR/JEEP/VAN</span>{" "}
@@ -117,13 +138,21 @@ const VrnEligibilityContainer = ({ handleBack }) => {
         </a>
       </div>
 
-      {/* Button and Input Section */}
-      <div className="flex flex-col items-start justify-between relative h-[50%]">
+      {/* Input and Submit Form */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        className="flex flex-col items-start justify-between relative h-[50%]"
+      >
         <div className="w-[21.76rem] h-[3.35rem] flex items-start justify-center m-0 p-0">
           <VrnInputField />
         </div>
+
         <div>
           <Button
+            type="submit"
             style={`${
               loading
                 ? "bg-[#A0A0A0] cursor-not-allowed"
@@ -171,7 +200,7 @@ const VrnEligibilityContainer = ({ handleBack }) => {
             )}
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

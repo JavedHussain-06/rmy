@@ -26,17 +26,17 @@ whatYouWillGet: [
 
  , hwoItWorks: [
     {
-      icons: "/annualpass/assets/car.svg",
+      icons: "/assets/car.svg",
       heading: "Check Eligibility",
       subtext: "Enter Vehicle Registration Number (VRN) to check eligibility for Annual Pass."
     },
     {
-      icons: "/annualpass/assets/rupee.svg",
+      icons: "/assets/rupee.svg",
       heading: "Complete Payment",
       subtext: "Once eligible, pay ₹3000 securely via your preferred payment method"
     },
     {
-      icons: "/annualpass/assets/toll.svg",
+      icons: "/assets/toll.svg",
       heading: "Enjoy Free Tolls",
       subtext: "Freely pass through 200 National Highway tolls for up to 1 year"
     }

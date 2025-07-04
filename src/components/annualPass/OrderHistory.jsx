@@ -1,5 +1,4 @@
 import Button from "../Button";
-import { FaArrowLeft } from "react-icons/fa";
 
 const orders = [
   {
@@ -47,8 +46,7 @@ const OrderHistory = ({ goBack, handleBuy }) => {
           handleClick={goBack}
           style="text-[1.12rem] text-darkBlue cursor-pointer tracking-[0.008rem] font-bold hover:underline"
         >
-          <FaArrowLeft className="inline ml-1" />
-          Back to Dashboard
+          ← Back to Dashboard
         </Button>
       </div>
 
@@ -73,22 +71,12 @@ const OrderHistory = ({ goBack, handleBuy }) => {
             >
               <div className="space-y-1 text-sm text-[#1B1B1D]">
                 <p>
-                  <span className="font-[500] text-[1.2rem]">
-                    Annual Pass -{" "}
-                  </span>
-                  <span className="font-bold text-[1.2rem]">
-                    {order.numberPlate}
-                  </span>
+                  <span className="font-[500] text-[1.2rem]">Annual Pass - </span>
+                  <span className="font-bold text-[1.2rem]">{order.numberPlate}</span>
                 </p>
-                <p className="text-[#00000099] text-[0.89rem]">
-                  Amount : {order.amount}
-                </p>
-                <p className="text-[#00000099] text-[0.89rem]">
-                  Date & Time : {order.dateTime}
-                </p>
-                <p className="text-[#00000099] text-[0.89rem]">
-                  Transaction ID : {order.txnId}
-                </p>
+                <p className="text-[#00000099] text-[0.89rem]">Amount : {order.amount}</p>
+                <p className="text-[#00000099] text-[0.89rem]">Date & Time : {order.dateTime}</p>
+                <p className="text-[#00000099] text-[0.89rem]">Transaction ID : {order.txnId}</p>
               </div>
 
               <div className="flex flex-col justify-between items-end flex-shrink-0 ml-4">
@@ -110,18 +98,17 @@ const OrderHistory = ({ goBack, handleBuy }) => {
         <>
           {/* Empty State */}
           <div className="flex-1 flex items-center justify-center">
-            <p className="text-gray-500 text-xl font-semibold">
-              No order records found
-            </p>
+            <p className="text-gray-500 text-xl font-semibold">No order records found</p>
           </div>
 
           {/* Buy Button Fixed Bottom Right */}
           <Button
-            handleClick={handleBuy}
-            style="absolute inset-0 top-80 m-auto w-fit h-fit bg-darkBlue text-white font-inter font-semibold px-6 py-3 rounded-[0.7rem] shadow-md "
-          >
-            Buy Annual Pass
-          </Button>
+  handleClick={handleBuy}
+  style="absolute inset-0 top-80 m-auto w-fit h-fit bg-darkBlue text-white font-inter font-semibold px-6 py-3 rounded-[0.7rem] shadow-md "
+>
+  Buy Annual Pass
+</Button>
+
         </>
       )}
     </div>

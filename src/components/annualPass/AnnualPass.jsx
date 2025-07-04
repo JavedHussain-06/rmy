@@ -32,8 +32,8 @@ const AnnualPass = ({
       ? formatNumberPlate(numberPlate)
       : formatNumberPlate(placeHolder);
  const backgroundImage = blackBg
-  ? "/annualpass/assets/GrayedOutFastag.png"
-  : "/annualpass/assets/Fastag-template.png";
+  ? "/assets/GrayedOutFastag.png"
+  : "/assets/Fastag-template.png";
 
   return (
     <div
@@ -71,7 +71,7 @@ const AnnualPass = ({
           ) : (
             <>
               <img
-                src="/annualpass/assets/dfc-logo.svg"
+                src="/assets/dfc-logo.svg"
                 alt="DFC Logo"
                 className="h-8 w-auto object-contain"
               />
